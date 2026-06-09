@@ -1,0 +1,404 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Cheat Sheet Builder — Create Custom Reference Cards</title>
+<meta name="description" content="Free online tool to create, customize, and export custom cheat sheets and reference cards. Choose from templates or build your own with live preview.">
+<meta property="og:title" content="Cheat Sheet Builder — Create Custom Reference Cards">
+<meta property="og:description" content="Free online tool to create, customize, and export custom cheat sheets and reference cards with live preview.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://cheatsheet-builder.pages.dev">
+<meta property="og:image" content="https://cheatsheet-builder.pages.dev/og-image.png">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="Cheat Sheet Builder — Create Custom Reference Cards">
+<meta name="twitter:description" content="Create, customize, and export custom cheat sheets with live preview.">
+<link rel="canonical" href="https://cheatsheet-builder.pages.dev">
+<script src="https://cdnjs.cloudflare.com/ajax/libs/html2canvas/1.4.1/html2canvas.min.js"></script>
+<script type="application/ld+json">
+{
+  "@context": "https://schema.org",
+  "@type": "WebApplication",
+  "name": "Cheat Sheet Builder",
+  "url": "https://cheatsheet-builder.pages.dev",
+  "description": "Free online tool to create, customize, and export custom cheat sheets and reference cards.",
+  "applicationCategory": "DeveloperApplication",
+  "operatingSystem": "Any",
+  "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+  "browserRequirements": "Requires JavaScript"
+}
+</script>
+<style>
+*,*::before,*::after{box-sizing:border-box;margin:0;padding:0}
+:root{--bg:#0d1117;--surface:#161b22;--surface2:#21262d;--border:#30363d;--text:#e6edf3;--text2:#8b949e;--accent:#58a6ff;--accent2:#1f6feb;--radius:8px;--font:14px}
+body{font-family:-apple-system,BlinkMacSystemFont,'Segoe UI',Helvetica,Arial,sans-serif;background:var(--bg);color:var(--text);font-size:var(--font);line-height:1.5;min-height:100vh}
+a{color:var(--accent);text-decoration:none}a:hover{text-decoration:underline}
+button{cursor:pointer;font-family:inherit;font-size:inherit}
+input,select,textarea{font-family:inherit;font-size:inherit}
+h1,h2,h3{font-weight:600}
+
+/* Themes */
+.theme-monokai{--accent:#a6e22e;--accent2:#f92672;--surface:#272822;--surface2:#3e3d32;--border:#49483e;--text:#f8f8f2;--text2:#75715e}
+.theme-solarized{--accent:#b58900;--accent2:#268bd2;--surface:#073642;--surface2:#002b36;--border:#586e75;--text:#fdf6e3;--text2:#93a1a1}
+.theme-dracula{--accent:#bd93f9;--accent2:#ff79c6;--surface:#282a36;--surface2:#44475a;--border:#6272a4;--text:#f8f8f2;--text2:#6272a4}
+.theme-github{--accent:#0969da;--accent2:#0550ae;--surface:#f6f8fa;--surface2:#ffffff;--border:#d0d7de;--text:#1f2328;--text2:#656d76}
+.theme-nord{--accent:#88c0d0;--accent2:#81a1c1;--surface:#3b4252;--surface2:#434c5e;--border:#4c566a;--text:#eceff4;--text2:#d8dee9}
+
+/* Layout */
+.app{display:flex;min-height:100vh}
+.editor{width:420px;min-width:420px;background:var(--surface);border-right:1px solid var(--border);overflow-y:auto;padding:20px;display:flex;flex-direction:column;gap:16px}
+.preview-wrap{flex:1;overflow-y:auto;padding:32px;background:var(--bg)}
+.toolbar{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.toolbar select,.toolbar input[type=number]{background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:6px 10px}
+.toolbar label{color:var(--text2);font-size:12px;display:flex;align-items:center;gap:4px}
+.btn{background:var(--accent2);color:#fff;border:none;border-radius:var(--radius);padding:8px 14px;font-weight:500;white-space:nowrap;transition:opacity .15s}
+.btn:hover{opacity:.85}
+.btn-sm{padding:5px 10px;font-size:12px}
+.btn-outline{background:transparent;color:var(--accent);border:1px solid var(--border)}
+.btn-danger{background:#da3633}
+
+.section-block{background:var(--surface2);border:1px solid var(--border);border-radius:var(--radius);padding:12px;display:flex;flex-direction:column;gap:8px}
+.section-block .sec-header{display:flex;align-items:center;gap:8px}
+.section-block .sec-header input{flex:1;background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:6px 10px}
+.section-block .sec-header select{background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:5px 8px}
+.row-item{display:flex;gap:6px;align-items:center}
+.row-item input{background:var(--surface);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:5px 8px}
+.row-item .cmd{width:38%}
+.row-item .desc{flex:1}
+
+/* Preview cheat sheet */
+.cheatsheet{background:var(--surface);border-radius:var(--radius);padding:24px;max-width:1100px;margin:0 auto}
+.cs-title{text-align:center;font-size:1.8em;font-weight:700;margin-bottom:4px;color:var(--text)}
+.cs-subtitle{text-align:center;color:var(--text2);margin-bottom:20px;font-size:.9em}
+.cs-grid{column-gap:20px}
+.cs-section{break-inside:avoid;margin-bottom:16px}
+.cs-section h3{font-size:1em;color:var(--accent);border-bottom:1px solid var(--border);padding-bottom:4px;margin-bottom:6px;text-transform:uppercase;letter-spacing:.5px}
+.cs-section .cat-badge{font-size:.65em;background:var(--accent2);color:#fff;padding:2px 6px;border-radius:3px;margin-left:6px;text-transform:none;letter-spacing:0}
+.cs-row{display:flex;padding:3px 0;border-bottom:1px solid var(--border)}
+.cs-row:last-child{border-bottom:none}
+.cs-row .c{width:42%;font-family:'SF Mono',SFMono-Regular,Consolas,'Liberation Mono',Menlo,monospace;font-size:.85em;color:var(--accent);padding-right:8px;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.cs-row .d{flex:1;color:var(--text2);font-size:.85em}
+
+/* Templates bar */
+.templates{display:flex;flex-wrap:wrap;gap:6px}
+.tpl-btn{background:var(--surface2);color:var(--text2);border:1px solid var(--border);border-radius:var(--radius);padding:4px 10px;font-size:12px;transition:all .15s}
+.tpl-btn:hover,.tpl-btn.active{border-color:var(--accent);color:var(--accent)}
+
+/* Export bar */
+.exports{display:flex;flex-wrap:wrap;gap:8px;margin-top:4px}
+
+/* Features */
+.features-section{background:var(--surface);border-radius:var(--radius);padding:32px;max-width:1100px;margin:40px auto;display:grid;grid-template-columns:repeat(auto-fit,minmax(220px,1fr));gap:24px}
+.feature{text-align:center}
+.feature .icon{font-size:2em;margin-bottom:8px}
+.feature h3{font-size:1em;color:var(--accent);margin-bottom:4px}
+.feature p{color:var(--text2);font-size:.85em}
+
+/* FAQ */
+.faq-section{max-width:800px;margin:0 auto 40px;padding:0 16px}
+.faq-section h2{text-align:center;margin-bottom:20px;color:var(--text)}
+details{background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);margin-bottom:8px;overflow:hidden}
+summary{padding:12px 16px;cursor:pointer;font-weight:500;user-select:none}
+summary:hover{background:var(--surface2)}
+details p{padding:0 16px 14px;color:var(--text2);font-size:.9em}
+
+/* Email + Footer */
+.email-section{text-align:center;padding:32px;max-width:500px;margin:0 auto}
+.email-section h2{margin-bottom:8px}
+.email-section p{color:var(--text2);margin-bottom:14px;font-size:.9em}
+.email-form{display:flex;gap:8px;justify-content:center}
+.email-form input{flex:1;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:10px 14px}
+.email-form button{background:var(--accent2);color:#fff;border:none;border-radius:var(--radius);padding:10px 20px;font-weight:500}
+footer{text-align:center;padding:24px;color:var(--text2);font-size:.8em;border-top:1px solid var(--border)}
+footer a{color:var(--text2);margin:0 8px}
+
+@media(max-width:900px){
+  .app{flex-direction:column}
+  .editor{width:100%;min-width:unset;max-height:50vh;border-right:none;border-bottom:1px solid var(--border)}
+  .preview-wrap{padding:16px}
+}
+@media print{
+  .editor,.exports,.features-section,.faq-section,.email-section,footer{display:none!important}
+  .app{display:block}
+  .preview-wrap{padding:0}
+  .cheatsheet{box-shadow:none}
+}
+</style>
+</head>
+<body>
+<!-- HEADER -->
+<div style="text-align:center;padding:20px 16px 8px;border-bottom:1px solid var(--border)">
+  <h1 style="font-size:1.4em">🛠️ Cheat Sheet Builder</h1>
+  <p style="color:var(--text2);font-size:.85em">Create custom reference cards — pick a template or build your own</p>
+</div>
+
+<!-- EDITOR + PREVIEW -->
+<div class="app" id="app">
+  <div class="editor" id="editor">
+    <!-- Settings -->
+    <div class="toolbar">
+      <label>Columns <input type="number" id="colCount" value="2" min="1" max="4" style="width:52px"></label>
+      <label>Font <input type="number" id="fontSize" value="14" min="10" max="22" style="width:52px"></label>
+      <label>Theme
+        <select id="themeSelect">
+          <option value="monokai">Monokai</option>
+          <option value="solarized">Solarized</option>
+          <option value="dracula" selected>Dracula</option>
+          <option value="github">GitHub Light</option>
+          <option value="nord">Nord</option>
+        </select>
+      </label>
+    </div>
+
+    <!-- Templates -->
+    <div>
+      <div style="font-size:12px;color:var(--text2);margin-bottom:4px">Templates:</div>
+      <div class="templates" id="templateBar"></div>
+    </div>
+
+    <!-- Title -->
+    <div>
+      <input type="text" id="csTitle" value="My Cheat Sheet" style="width:100%;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:8px 12px;font-weight:600;font-size:1.1em" placeholder="Cheat sheet title">
+      <input type="text" id="csSubtitle" value="" style="width:100%;background:var(--surface2);color:var(--text);border:1px solid var(--border);border-radius:var(--radius);padding:6px 12px;margin-top:4px" placeholder="Subtitle (optional)">
+    </div>
+
+    <!-- Sections -->
+    <div id="sections"></div>
+    <button class="btn btn-outline" onclick="addSection()" style="width:100%">+ Add Section</button>
+
+    <!-- Export -->
+    <div class="exports">
+      <button class="btn btn-sm" onclick="copyHTML()">📋 Copy HTML</button>
+      <button class="btn btn-sm" onclick="window.print()">🖨️ PDF (Print)</button>
+      <button class="btn btn-sm" onclick="downloadPNG()">🖼️ Download PNG</button>
+    </div>
+  </div>
+
+  <div class="preview-wrap" id="previewWrap">
+    <div class="cheatsheet" id="cheatsheet">
+      <div class="cs-title" id="prevTitle">My Cheat Sheet</div>
+      <div class="cs-subtitle" id="prevSub"></div>
+      <div class="cs-grid" id="csGrid"></div>
+    </div>
+  </div>
+</div>
+
+<!-- FEATURES -->
+<div class="features-section">
+  <div class="feature"><div class="icon">⚡</div><h3>Instant Preview</h3><p>See your cheat sheet rendered live as you type — no refresh needed.</p></div>
+  <div class="feature"><div class="icon">🎨</div><h3>5 Color Themes</h3><p>Monokai, Solarized, Dracula, GitHub Light, and Nord themes built in.</p></div>
+  <div class="feature"><div class="icon">📦</div><h3>Ready-Made Templates</h3><p>Start with Git, VS Code, Vim, Python, JavaScript, or Docker templates.</p></div>
+  <div class="feature"><div class="icon">💾</div><h3>Multi-Format Export</h3><p>Copy as HTML, download as PDF via print, or save as PNG with one click.</p></div>
+</div>
+
+<!-- FAQ -->
+<div class="faq-section">
+  <h2>Frequently Asked Questions</h2>
+  <details><summary>Is Cheat Sheet Builder free?</summary><p>Yes, completely free and open source. No sign-up required — just start building.</p></details>
+  <details><summary>Can I edit a template after loading it?</summary><p>Absolutely. Click any template to load it, then change the title, sections, rows, theme, and layout freely.</p></details>
+  <details><summary>How do I export my cheat sheet?</summary><p>Use the three export buttons: Copy HTML to paste into a document, Print to save as PDF, or Download PNG for an image file.</p></details>
+</div>
+
+<!-- EMAIL -->
+<div class="email-section">
+  <h2>Get Cheat Sheet Tips</h2>
+  <p>Subscribe for new templates and productivity tips delivered to your inbox.</p>
+  <div class="email-form">
+    <input type="email" id="emailInput" placeholder="you@example.com">
+    <button onclick="handleSubscribe()">Subscribe</button>
+  </div>
+  <div id="emailMsg" style="margin-top:8px;font-size:.85em;display:none"></div>
+</div>
+
+<!-- FOOTER -->
+<footer>
+  <a href="/">Home</a>
+  <a href="https://github.com/Chesten223/cheatsheet-builder">GitHub</a>
+  <a href="#app">Builder</a>
+  <br><br>
+  © 2026 Cheat Sheet Builder &mdash; Built with ❤️
+</footer>
+
+<script>
+// ── Data ──
+const CATEGORIES = ['Keyboard Shortcuts','CLI Commands','Code Snippets','Custom'];
+const CAT_COLORS = {'Keyboard Shortcuts':'#58a6ff','CLI Commands':'#3fb950','Code Snippets':'#d2a8ff','Custom':'#f0883e'};
+
+const TEMPLATES = {
+  'Git': [
+    {title:'Basic Commands',cat:'CLI Commands',rows:[['git init','Initialize a new repo'],['git clone <url>','Clone remote repo'],['git status','Show working tree status'],['git add .','Stage all changes'],['git commit -m "msg"','Commit staged changes'],['git push','Push to remote'],['git pull','Fetch and merge remote']]},
+    {title:'Branching',cat:'CLI Commands',rows:[['git branch','List branches'],['git branch <name>','Create branch'],['git checkout <branch>','Switch branch'],['git checkout -b <name>','Create & switch'],['git merge <branch>','Merge into current'],['git branch -d <name>','Delete branch']]},
+    {title:'Undo & Reset',cat:'CLI Commands',rows:[['git reset HEAD <file>','Unstage file'],['git checkout -- <file>','Discard changes'],['git reset --soft HEAD~1','Undo last commit (keep staged)'],['git reset --hard HEAD~1','Undo last commit (discard)'],['git stash','Stash changes'],['git stash pop','Apply stash']]}
+  ],
+  'VS Code': [
+    {title:'General',cat:'Keyboard Shortcuts',rows:[['Ctrl+Shift+P','Command Palette'],['Ctrl+P','Quick Open file'],['Ctrl+`','Toggle terminal'],['Ctrl+B','Toggle sidebar'],['Ctrl+Shift+E','Explorer'],['Ctrl+Shift+F','Search across files']]},
+    {title:'Editing',cat:'Keyboard Shortcuts',rows:[['Alt+↑/↓','Move line up/down'],['Ctrl+Shift+K','Delete line'],['Ctrl+/','Toggle comment'],['Ctrl+D','Select next occurrence'],['Ctrl+Shift+L','Select all occurrences'],['Alt+Shift+F','Format document']]},
+    {title:'Debugging',cat:'Keyboard Shortcuts',rows:[['F5','Start debugging'],['F9','Toggle breakpoint'],['F10','Step over'],['F11','Step into'],['Shift+F11','Step out'],['Shift+F5','Stop debugging']]}
+  ],
+  'Vim': [
+    {title:'Modes',cat:'Keyboard Shortcuts',rows:[['i','Insert mode'],['v','Visual mode'],['V','Visual line mode'],['Esc','Normal mode']]} ,
+    {title:'Navigation',cat:'Keyboard Shortcuts',rows:[['h j k l','Left/Down/Up/Right'],['w / b','Next/Prev word start'],['0 / $','Line start/end'],['gg / G','File start/end'],['Ctrl+d / Ctrl+u','Half page down/up'],[':nn','Go to line nn']]},
+    {title:'Editing',cat:'Keyboard Shortcuts',rows:[['dd','Delete line'],['yy','Yank line'],['p / P','Paste after/before'],['x','Delete char'],['u','Undo'],['Ctrl+r','Redo'],['. ','Repeat last change']]}
+  ],
+  'Python': [
+    {title:'Data Types',cat:'Code Snippets',rows:[['x = [1, 2, 3]','List'],['x = (1, 2, 3)','Tuple'],['x = {"a": 1}','Dict'],['x = {1, 2, 3}','Set'],['x = "hello"','String']]},
+    {title:'Comprehensions',cat:'Code Snippets',rows:[['[x for x in iter]','List comprehension'],('{k: v for k, v in ...}','Dict comprehension'),('{x for x in iter}','Set comprehension')]},
+    {title:'Common Patterns',cat:'Code Snippets',rows:[['with open("f") as f:','Context manager'],['try: ... except E: ...','Exception handling'],['lambda x: x * 2','Lambda'],['f"Hello {name}"','f-string'],['if __name__ == "__main__":','Script entry point']]}
+  ],
+  'JavaScript': [
+    {title:'ES6+',cat:'Code Snippets',rows:[['const / let','Block-scoped vars'],['[a, b] = arr','Destructuring'],['({a, b} = obj)','Object destructuring'],['fn = () => {}','Arrow function'],['async/await','Async functions'],['...args','Spread / Rest']]},
+    {title:'Array Methods',cat:'Code Snippets',rows:[['.map(fn)','Transform elements'],['.filter(fn)','Filter elements'],['.reduce(fn, init)','Accumulate values'],['.find(fn)','First match'],['.some(fn) / .every(fn)','Existence checks'],['.flat(depth)','Flatten nested arrays']]},
+    {title:'DOM',cat:'Code Snippets',rows:[['document.querySelector(s)','#id, .class, tag'],['el.addEventListener(e, fn)','Attach event'],['el.classList.toggle(c)','Toggle class'],['fetch(url).then(r=>r.json())','HTTP GET JSON'],['localStorage.setItem(k,v)','Persist data']]}
+  ],
+  'Docker': [
+    {title:'Containers',cat:'CLI Commands',rows:[['docker run -it ubuntu bash','Run interactive container'],['docker ps','List running containers'],['docker ps -a','All containers'],['docker stop <id>','Stop container'],['docker rm <id>','Remove container'],['docker logs <id>','View logs']]},
+    {title:'Images',cat:'CLI Commands',rows:[['docker build -t name .','Build from Dockerfile'],['docker images','List images'],['docker pull <image>','Pull from registry'],['docker rmi <image>','Remove image'],['docker tag src dst','Tag image']]},
+    {title:'Compose',cat:'CLI Commands',rows:[['docker compose up -d','Start services detached'],['docker compose down','Stop and remove'],['docker compose logs -f','Follow logs'],['docker compose ps','List services'],['docker compose build','Rebuild images']]}
+  ]
+};
+
+// ── State ──
+let state = {sections:[]};
+let activeTemplate = null;
+
+// ── Init ──
+function init(){
+  renderTemplateBar();
+  loadTemplate('Git');
+  ['csTitle','csSubtitle','colCount','fontSize','themeSelect'].forEach(id=>
+    document.getElementById(id).addEventListener('input', renderPreview)
+  );
+}
+
+function renderTemplateBar(){
+  const bar = document.getElementById('templateBar');
+  bar.innerHTML = Object.keys(TEMPLATES).map(t=>
+    `<button class="tpl-btn${activeTemplate===t?' active':''}" onclick="loadTemplate('${t}')">${t}</button>`
+  ).join('');
+}
+
+function loadTemplate(name){
+  activeTemplate = name;
+  document.getElementById('csTitle').value = name + ' Cheat Sheet';
+  document.getElementById('csSubtitle').value = 'Quick reference for ' + name;
+  state.sections = JSON.parse(JSON.stringify(TEMPLATES[name]));
+  renderTemplateBar();
+  renderSections();
+  renderPreview();
+}
+
+// ── Sections Editor ──
+function renderSections(){
+  const el = document.getElementById('sections');
+  el.innerHTML = '';
+  state.sections.forEach((sec,i)=>{
+    const div = document.createElement('div');
+    div.className = 'section-block';
+    div.innerHTML = `
+      <div class="sec-header">
+        <input value="${esc(sec.title)}" oninput="state.sections[${i}].title=this.value;renderPreview()" placeholder="Section title">
+        <select onchange="state.sections[${i}].cat=this.value;renderPreview()">
+          ${CATEGORIES.map(c=>`<option${sec.cat===c?' selected':''}>${c}</option>`).join('')}
+        </select>
+        <button class="btn btn-sm btn-danger" onclick="state.sections.splice(${i},1);renderSections();renderPreview()">✕</button>
+      </div>
+      <div class="sec-rows" id="secRows${i}"></div>
+      <button class="btn btn-sm btn-outline" onclick="state.sections[${i}].rows.push(['','']);renderSections();renderPreview()">+ Row</button>
+    `;
+    el.appendChild(div);
+    const rowsEl = div.querySelector('.sec-rows');
+    sec.rows.forEach(([cmd,desc],j)=>{
+      const r = document.createElement('div');
+      r.className = 'row-item';
+      r.innerHTML = `
+        <input class="cmd" value="${esc(cmd)}" placeholder="Command" oninput="state.sections[${i}].rows[${j}][0]=this.value;renderPreview()">
+        <input class="desc" value="${esc(desc)}" placeholder="Description" oninput="state.sections[${i}].rows[${j}][1]=this.value;renderPreview()">
+        <button class="btn btn-sm btn-danger" onclick="state.sections[${i}].rows.splice(${j},1);renderSections();renderPreview()">✕</button>
+      `;
+      rowsEl.appendChild(r);
+    });
+  });
+}
+
+function addSection(){
+  state.sections.push({title:'New Section',cat:'Custom',rows:[['','']]});
+  renderSections();
+  renderPreview();
+}
+
+function esc(s){return String(s).replace(/"/g,'&quot;').replace(/</g,'&lt;')}
+
+// ── Preview ──
+function renderPreview(){
+  const title = document.getElementById('csTitle').value || 'Cheat Sheet';
+  const sub = document.getElementById('csSubtitle').value;
+  const cols = Math.min(4,Math.max(1,+document.getElementById('colCount').value||2));
+  const fs = Math.min(22,Math.max(10,+document.getElementById('fontSize').value||14));
+  const theme = document.getElementById('themeSelect').value;
+
+  document.getElementById('prevTitle').textContent = title;
+  document.getElementById('prevSub').textContent = sub;
+  document.getElementById('cheatsheet').style.fontSize = fs+'px';
+
+  const grid = document.getElementById('csGrid');
+  grid.style.columnCount = cols;
+  grid.innerHTML = '';
+
+  state.sections.forEach(sec=>{
+    if(!sec.rows.filter(r=>r[0]||r[1]).length && !sec.title) return;
+    const div = document.createElement('div');
+    div.className = 'cs-section';
+    const catColor = CAT_COLORS[sec.cat]||'var(--accent2)';
+    div.innerHTML = `<h3>${esc(sec.title)}<span class="cat-badge" style="background:${catColor}">${esc(sec.cat)}</span></h3>` +
+      sec.rows.map(([c,d])=>{
+        if(!c&&!d) return '';
+        return `<div class="cs-row"><span class="c">${esc(c||'—')}</span><span class="d">${esc(d)}</span></div>`;
+      }).join('');
+    grid.appendChild(div);
+  });
+
+  // Apply theme to preview
+  const cs = document.getElementById('cheatsheet');
+  cs.className = 'cheatsheet theme-'+theme;
+}
+
+// ── Export ──
+function copyHTML(){
+  const html = document.getElementById('cheatsheet').outerHTML;
+  navigator.clipboard.writeText(html).then(()=>{
+    const btn = event.target.closest('button');
+    const orig = btn.textContent;
+    btn.textContent = '✅ Copied!';
+    setTimeout(()=>btn.textContent = orig, 1500);
+  });
+}
+
+function downloadPNG(){
+  html2canvas(document.getElementById('cheatsheet'),{backgroundColor:'#0d1117',scale:2}).then(canvas=>{
+    const a = document.createElement('a');
+    a.download = 'cheatsheet.png';
+    a.href = canvas.toDataURL('image/png');
+    a.click();
+  });
+}
+
+// ── Email ──
+function handleSubscribe(){
+  const email = document.getElementById('emailInput').value.trim();
+  const msg = document.getElementById('emailMsg');
+  msg.style.display = 'block';
+  if(!email||!email.includes('@')){
+    msg.textContent = 'Please enter a valid email address.';
+    msg.style.color = '#da3633';
+    return;
+  }
+  msg.textContent = '✅ Thanks for subscribing!';
+  msg.style.color = '#3fb950';
+  document.getElementById('emailInput').value = '';
+}
+
+// Boot
+init();
+</script>
+</body>
+</html>
